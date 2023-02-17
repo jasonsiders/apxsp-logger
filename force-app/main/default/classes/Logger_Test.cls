@@ -295,7 +295,7 @@ private class Logger_Test {
 		// where the Logger class is called from - not the Logger class itself
 		String prefixFormat = 'Class.{0}.';
 		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
-		DmlMock dmlMock = (DmlMock) apxsp.DB.setDmlEngine(new DmlMock());
+		apxsp.DmlMock dmlMock = (apxsp.DmlMock) apxsp.DB.setDmlEngine(new apxsp.DmlMock());
 		// Try logging from directly in the test class
 		Logger.finest('Test Message');
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Did not log');

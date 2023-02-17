@@ -17,7 +17,7 @@ global without sharing abstract class Logger {
 		get {
 			Boolean matchesSettings = Logger.Threshold?.name()?.equalsIgnoreCase(Logger.Settings?.Level__c);
 			if (matchesSettings != true) {
-				LoggingLevel newLevel = (LoggingLevel) EnumUtils.valueOf(Settings?.Level__c, LoggingLevel.class);
+				LoggingLevel newLevel = (LoggingLevel) apxsp.EnumUtils.valueOf(Settings?.Level__c, LoggingLevel.class);
 				Logger.Threshold = (newLevel != null) ? newLevel : LoggingLevel.NONE;
 			}
 			return Logger.Threshold;
@@ -151,7 +151,7 @@ global without sharing abstract class Logger {
 	static Log_Setting__c getLogSettings() {
 		// Returns a Custom Setting record that corresponds to the running user/their profile/their organization
 		Log_Setting__c logSettings = Log_Setting__c.getInstance();
-		LoggingLevel level = (LoggingLevel) EnumUtils.valueOf(logSettings?.Level__c, LoggingLevel.class);
+		LoggingLevel level = (LoggingLevel) apxsp.EnumUtils.valueOf(logSettings?.Level__c, LoggingLevel.class);
 		if (level == null) {
 			// Either no org defaults exist, or it has a missing/invalid Level__c
 			// If this happens, upsert a valid settings record and set as org default
@@ -193,7 +193,7 @@ global without sharing abstract class Logger {
 		global String logMessage;
 
 		public void log() {
-			LoggingLevel level = (LoggingLevel) EnumUtils.valueOf(logLevelName, LoggingLevel.class);
+			LoggingLevel level = (LoggingLevel) apxsp.EnumUtils.valueOf(logLevelName, LoggingLevel.class);
 			if (level != null) {
 				Logger.log(level, logMessage);
 			}
