@@ -45,7 +45,7 @@ global without sharing abstract class Logger {
 		}
 	}
 
-	@InvocableMethod(category='Logging' configurationEditor='c-cpe-logger' label='Post to Log')
+	@InvocableMethod(category='Logging' configurationEditor='apxsp-cpe-logger' label='Post to Log')
 	global static void logFromFlow(List<LogInput> logInputs) {
 		// Exposes the logger to Flows
 		// Note: This flow action does not publish logs
@@ -64,7 +64,7 @@ global without sharing abstract class Logger {
 	// **** PUBLIC **** //
 	public static void publish() {
 		Logger.PublishedLogs.addAll(Logger.PendingLogs);
-		DatabaseLayer.Dml.doPublish(Logger.PendingLogs);
+		apxsp.DB.Dml.doPublish(Logger.PendingLogs);
 		Logger.PendingLogs.clear();
 	}
 

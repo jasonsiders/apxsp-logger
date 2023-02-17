@@ -6,7 +6,7 @@ public without sharing class LogEventHandler extends apxsp.TriggerHandler {
 		new LogGenerator(this.triggerNew)?.createLogRecords();
 	}
 
-	protected override Type getHandlerType() {
+	public override Type getType() {
 		return LogEventHandler.class;
 	}
 }

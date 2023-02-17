@@ -308,7 +308,7 @@ private class Logger_Test {
 		// The Log Event's stack trace field should start from
 		// where the Logger class is called from - not the Logger class itself
 		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
-		DmlMock dmlMock = (DmlMock) DatabaseLayer.setDmlEngine(new DmlMock());
+		DmlMock dmlMock = (DmlMock) apxsp.DB.setDmlEngine(new DmlMock());
 		// Try logging from directly in the test class
 		Logger.finest('Test Message');
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Did not log');
