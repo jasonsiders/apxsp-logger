@@ -6,12 +6,12 @@
 			"dependencies": [
 				{
 					"package": "apex-starter-pack",
-					"versionNumber": "0.2.0.LATEST"
+					"versionNumber": "0.3.0.LATEST"
 				}
 			],
 			"package": "apxsp-logger",
-			"versionName": "ver 0.1.0",
-			"versionNumber": "0.1.0.NEXT",
+			"versionName": "ver 0.2.0",
+			"versionNumber": "0.2.0.NEXT",
 			"versionDescription": ""
 		}
 	],
@@ -22,6 +22,7 @@
 	"packageAliases": {
 		"apex-starter-pack": "0HoDn000000k9sMKAQ",
 		"apxsp-logger": "0HoDn000000k9xWKAQ",
-		"apxsp-logger@0.1.0-1": "04tDn0000006m0XIAQ"
+		"apxsp-logger@0.1.0-1": "04tDn0000006m0XIAQ",
+		"apxsp-logger@0.2.0-1": "04tDn0000006m0hIAA"
 	}
 }
