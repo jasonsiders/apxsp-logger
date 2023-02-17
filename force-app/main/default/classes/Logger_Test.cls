@@ -293,15 +293,17 @@ private class Logger_Test {
 	static void shouldExcludeSelfFromStackTrace() {
 		// The Log Event's stack trace field should start from
 		// where the Logger class is called from - not the Logger class itself
+		String prefixFormat = 'Class.{0}.';
 		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
 		DmlMock dmlMock = (DmlMock) apxsp.DB.setDmlEngine(new DmlMock());
 		// Try logging from directly in the test class
 		Logger.finest('Test Message');
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Did not log');
 		Log_Event__e event = Logger.PendingLogs[0];
+		String prefix = String.format(prefixFormat, new List<String>{String.valueOf(Logger_Test.class)});
 		System.assert(
-			event.Stack_Trace__c?.startsWithIgnoreCase('Class.Logger_Test.'),
-			'Expected Stack Trace to start with "Class.Logger_Test." - Actual: "' +
+			event.Stack_Trace__c?.startsWithIgnoreCase(prefix),
+			'Expected Stack Trace to start with "' + prefix + '" - Actual: "' +
 			event.Stack_Trace__c +
 			'"'
 		);
@@ -313,8 +315,10 @@ private class Logger_Test {
 		new MyClass().logSomething();
 		System.assertEquals(2, Logger.PendingLogs?.size(), 'Did not log from child class');
 		event = Logger.PendingLogs[1];
+
+		prefix = String.format(prefixFormat, new List<String>{String.valueOf(Logger_Test.MyClass.class)});
 		System.assert(
-			event.Stack_Trace__c?.startsWithIgnoreCase('Class.Logger_Test.MyClass.'),
+			event.Stack_Trace__c?.startsWithIgnoreCase(prefix),
 			'Expected Stack Trace to start with "Class.Logger_Test.MyClass." - Actual: "' +
 			event.Stack_Trace__c +
 			'"'
