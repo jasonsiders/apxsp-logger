@@ -1,11 +1,11 @@
 @IsTest
-private class LogPublisher_Test {
+private class InvocableLogPublisher_Test {
     @IsTest 
     static void shouldLog() {
         Logger.log('This is a test'); 
 
         Test.startTest();
-        LogPublisher.invoke(); 
+        InvocableLogPublisher.invoke(); 
         Test.stopTest();
 
         System.assertEquals(1, Logger.PublishedLogs?.size(), 'Wrong # of Published Logs');
@@ -14,7 +14,7 @@ private class LogPublisher_Test {
     @IsTest 
     static void shouldDoNothingIfNoLogs() {
         Test.startTest();
-        LogPublisher.invoke(); 
+        InvocableLogPublisher.invoke(); 
         Test.stopTest();
 
         System.assertEquals(0, Logger.PublishedLogs?.size(), 'Wrong # of Published Logs');
@@ -29,7 +29,7 @@ private class LogPublisher_Test {
         Logger.log('This is a test'); 
 
         Test.startTest();
-        LogPublisher.invoke(); 
+        InvocableLogPublisher.invoke(); 
         Test.stopTest();
 
         System.assertEquals(0, Logger.PublishedLogs?.size(), 'Wrong # of Published Logs');

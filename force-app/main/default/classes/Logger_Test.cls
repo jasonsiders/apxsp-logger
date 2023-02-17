@@ -76,7 +76,7 @@ private class Logger_Test {
 		RestContext.response = new RestResponse(); 
 
 		Test.startTest();
-		Logger.logFromApi();
+		Logger.log();
 		Test.stopTest();
 
 		System.assertEquals(1, Logger.PublishedLogs?.size(), 'Wrong # of published logs');
@@ -91,25 +91,10 @@ private class Logger_Test {
 		RestContext.response = new RestResponse(); 
 
 		Test.startTest();
-		Logger.logFromApi();
+		Logger.log();
 		Test.stopTest();
 
 		System.assertEquals(500, RestContext.response?.statusCode, 'Wrong Status Code'); 
-	}
-
-	@IsTest
-	static void shouldLogFromFlow() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
-		Logger.LogInput input = new Logger.LogInput();
-		input.logLevelName = LoggingLevel.FINEST.name();
-		input.logMessage = 'Hello world!';
-
-		Test.startTest();
-		Logger.logFromFlow(new List<Logger.LogInput>{ input });
-		Test.stopTest();
-
-		System.assertEquals(1, Logger.PendingLogs?.size(), 'Wrong # of pending logs');
-		System.assertEquals(input.logMessage, Logger.PendingLogs[0].Message__c, 'Wrong message');
 	}
 
 	@IsTest
@@ -120,7 +105,8 @@ private class Logger_Test {
 		input.logMessage = 'Hello world!';
 
 		Test.startTest();
-		Logger.logFromLightning(new List<Logger.LogInput>{ input });
+		Logger.log(new List<Logger.LogInput>{ input });
+		Logger.publish(); 
 		Test.stopTest();
 
 		System.assertEquals(1, Logger.PublishedLogs?.size(), 'Wrong # of pending logs');

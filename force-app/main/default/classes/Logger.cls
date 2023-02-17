@@ -26,49 +26,14 @@ global without sharing abstract class Logger {
 	}
 
 	// **** GLOBAL **** //
-	@HttpPost
-	global static void logFromApi() {
-		// Exposes the logger to external solutions
-		try {
-			String requestBody = RestContext.request?.requestBody?.toString();
-			List<LogInput> logInputs = (List<LogInput>) JSON.deserialize(requestBody, List<LogInput>.class);
-			Logger.logFromExternalSource(logInputs);
-			Logger.publish();
-			RestContext.response.statusCode = 200;
-		} catch (Exception error) {
-			RestContext.response.statusCode = 500;
-			RestContext.response.responseBody = Blob.valueOf(
-				JSON.serialize(new Map<String, String>{
-					 'message' => String.valueOf(error) 
-				})
-			);
-		}
-	}
-
-	@InvocableMethod(category='Logging' configurationEditor='apxsp-cpe-logger' label='Post to Log')
-	global static void logFromFlow(List<LogInput> logInputs) {
-		// Exposes the logger to Flows
-		// Note: This flow action does not publish logs
-		// To do this, flow developers must call the `LogPublisher.invoke()` action separately
-		// This is done to give flow developers the same flexibility as in Apex
-		Logger.logFromExternalSource(logInputs);
-	}
-
 	@AuraEnabled
-	global static void logFromLightning(List<LogInput> logInputs) {
-		// Exposes the logger to Aura Components & LWCs
-		Logger.logFromExternalSource(logInputs);
-		Logger.publish();
-	}
-
-	// **** PUBLIC **** //
-	public static void publish() {
+	global static void publish() {
 		Logger.PublishedLogs.addAll(Logger.PendingLogs);
 		apxsp.DB.Dml.doPublish(Logger.PendingLogs);
 		Logger.PendingLogs.clear();
 	}
 
-	public static void log(LoggingLevel level, Type apexClass, Object messageObj) {
+	global static void log(LoggingLevel level, Type apexClass, Object messageObj) {
 		// Note: Since Exception.getStackTraceString() returns null in managed packages,
 		// callers can use the optional `apexClass` param for rudimentary stack tracing
 		if (Logger.isEnabled(level)) {
@@ -89,69 +54,96 @@ global without sharing abstract class Logger {
 		}
 	}
 
-	public static void log(LoggingLevel level, Object message) {
+	global static void log(LoggingLevel level, Object message) {
 		Logger.log(level, null, message);
 	}
 
-	public static void log(Object message) {
+	global static void log(Object message) {
 		// Defaults to FINEST
 		Logger.finest(message);
 	}
 
-	public static void error(Type apexClass, Object message) {
+	@AuraEnabled
+	global static void log(List<LogInput> logInputs) {
+		// Primarily used by external sources (ie., invocable, aura, api)
+		for (LogInput logInput : logInputs) {
+			logInput.log();
+		}
+	}
+
+	global static void error(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.ERROR, apexClass, message);
 	}
 
-	public static void error(Object message) {
+	global static void error(Object message) {
 		Logger.error(null, message);
 	}
 
-	public static void warn(Type apexClass, Object message) {
+	global static void warn(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.WARN, apexClass, message);
 	}
 
-	public static void info(Type apexClass, Object message) {
+	global static void info(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.INFO, apexClass, message);
 	}
 
-	public static void info(Object message) {
+	global static void info(Object message) {
 		Logger.info(null, message);
 	}
 
-	public static void warn(Object message) {
+	global static void warn(Object message) {
 		Logger.warn(null, message);
 	}
 
-	public static void debug(Type apexClass, Object message) {
+	global static void debug(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.DEBUG, apexClass, message);
 	}
 
-	public static void debug(Object message) {
+	global static void debug(Object message) {
 		Logger.debug(null, message);
 	}
 
-	public static void fine(Type apexClass, Object message) {
+	global static void fine(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.FINE, apexClass, message);
 	}
 
-	public static void fine(Object message) {
+	global static void fine(Object message) {
 		Logger.fine(null, message);
 	}
 
-	public static void finer(Type apexClass, Object message) {
+	global static void finer(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.FINER, apexClass, message);
 	}
 
-	public static void finer(Object message) {
+	global static void finer(Object message) {
 		Logger.finer(null, message);
 	}
 
-	public static void finest(Type apexClass, Object message) {
+	global static void finest(Type apexClass, Object message) {
 		Logger.log(LoggingLevel.FINEST, apexClass, message);
 	}
 
-	public static void finest(Object message) {
+	global static void finest(Object message) {
 		Logger.finest(null, message);
+	}
+
+	@HttpPost
+	global static void log() {
+		// Exposes the logger to external solutions
+		try {
+			String requestBody = RestContext.request?.requestBody?.toString();
+			List<LogInput> logInputs = (List<LogInput>) JSON.deserialize(requestBody, List<LogInput>.class);
+			Logger.log(logInputs);
+			Logger.publish();
+			RestContext.response.statusCode = 200;
+		} catch (Exception error) {
+			RestContext.response.statusCode = 500;
+			RestContext.response.responseBody = Blob.valueOf(
+				JSON.serialize(new Map<String, String>{
+					 'message' => String.valueOf(error) 
+				})
+			);
+		}
 	}
 
 	// **** PRIVATE **** //
@@ -171,12 +163,6 @@ global without sharing abstract class Logger {
 			logSettings = defaultSettings;
 		}
 		return logSettings;
-	}
-
-	static void logFromExternalSource(List<LogInput> logInputs) {
-		for (LogInput logInput : logInputs) {
-			logInput.log();
-		}
 	}
 
 	static Boolean isEnabled(LoggingLevel currentLevel) {

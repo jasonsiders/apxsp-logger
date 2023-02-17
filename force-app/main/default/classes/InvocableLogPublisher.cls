@@ -1,6 +1,6 @@
-public with sharing class LogPublisher {
+global abstract class InvocableLogPublisher {
     @InvocableMethod(category='Logging' label='Publish Logs')
-    public static void invoke() {
+    global static void invoke() {
         Logger.publish();
     }
 }
