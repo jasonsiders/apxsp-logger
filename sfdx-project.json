@@ -10,8 +10,9 @@
                 }
             ],
             "package": "apxsp-logger",
-            "versionName": "v0.1.0",
-            "versionNumber": "0.1.0.NEXT"
+            "versionName": "ver 0.1.0",
+            "versionNumber": "0.1.0.NEXT",
+            "versionDescription": ""
         }
     ],
     "name": "apxsp-logger",
@@ -19,6 +20,7 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "56.0",
     "packageAliases": {
-        "apex-starter-pack": "04tDn0000006e0CIAQ"
+        "apex-starter-pack": "0HoDn000000k9sMKAQ",
+        "apxsp-logger": "0HoDn000000k9xWKAQ"
     }
 }
