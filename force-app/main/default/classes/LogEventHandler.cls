@@ -1,4 +1,4 @@
-public without sharing class LogEventHandler extends TriggerHandler {
+public without sharing class LogEventHandler extends apxsp.TriggerHandler {
 	@TestVisible
 	List<Log_Event__e> triggerNew = (Trigger.isExecuting) ? (List<Log_Event__e>) Trigger.new : new List<Log_Event__e>();
 
