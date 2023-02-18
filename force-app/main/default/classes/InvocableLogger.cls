@@ -1,5 +1,5 @@
 global abstract class InvocableLogger {
-    @InvocableMethod(category='Logging' configurationEditor='c-cpe-logger' label='Post to Log')
+    @InvocableMethod(category='Logging' configurationEditor='apxsp-cpe-logger' label='Post to Log')
 	global static void invoke(List<Logger.LogInput> logInputs) {
 		// Exposes the logger to Flows
 		// Note: This flow action does not publish logs
