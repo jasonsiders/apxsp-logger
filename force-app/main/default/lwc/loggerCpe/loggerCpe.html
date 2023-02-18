@@ -6,7 +6,7 @@
 				<span class="slds-text-heading_medium slds-var-m-left_small">Post to Log</span>
 			</div>
 			<div class="slds-var-p-horizontal_small">
-				<apxsp-cpe-combobox
+				<c-cpe-combobox
 					input-variables={inputVariables}
 					invocable-variable={levelVariable}
 					label="Log Level"
@@ -14,7 +14,7 @@
 					onchange={handleChange}
 					options={levelOptions}
 					required
-				></apxsp-cpe-combobox>
+				></c-cpe-combobox>
 				<lightning-textarea
 					label="Log Message"
 					field-level-help={messageTooltip}
