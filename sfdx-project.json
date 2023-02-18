@@ -1,28 +1,29 @@
 {
-	"packageDirectories": [
-		{
-			"path": "force-app",
-			"default": true,
-			"dependencies": [
-				{
-					"package": "apex-starter-pack",
-					"versionNumber": "0.3.0.LATEST"
-				}
-			],
-			"package": "apxsp-logger",
-			"versionName": "ver 0.2.0",
-			"versionNumber": "0.2.0.NEXT",
-			"versionDescription": ""
-		}
-	],
-	"name": "apxsp-logger",
-	"namespace": "",
-	"sfdcLoginUrl": "https://login.salesforce.com",
-	"sourceApiVersion": "56.0",
-	"packageAliases": {
-		"apex-starter-pack": "0HoDn000000k9sMKAQ",
-		"apxsp-logger": "0HoDn000000k9xWKAQ",
-		"apxsp-logger@0.1.0-1": "04tDn0000006m0XIAQ",
-		"apxsp-logger@0.2.0-1": "04tDn0000006m0hIAA"
-	}
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "dependencies": [
+        {
+          "package": "apex-starter-pack",
+          "versionNumber": "0.3.0.LATEST"
+        }
+      ],
+      "package": "apxsp-logger",
+      "versionName": "ver 0.3.0",
+      "versionNumber": "0.3.0.NEXT",
+      "versionDescription": ""
+    }
+  ],
+  "name": "apxsp-logger",
+  "namespace": "apxsp",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "56.0",
+  "packageAliases": {
+    "apex-starter-pack": "0HoDn000000k9sMKAQ",
+    "apxsp-logger": "0HoDn000000k9xWKAQ",
+    "apxsp-logger@0.1.0-1": "04tDn0000006m0XIAQ",
+    "apxsp-logger@0.2.0-1": "04tDn0000006m0hIAA",
+    "apxsp-logger@0.3.0-1": "04tDn0000006m1BIAQ"
+  }
 }
