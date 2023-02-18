@@ -34,7 +34,7 @@ export default class CpeLogger extends CustomPropertyEditor {
 
 	@api validate() {
 		let errors = [];
-		const innerComponents = ["c-cpe-combobox", "lightning-textarea"];
+		const innerComponents = ["apxsp-cpe-combobox", "lightning-textarea"];
 		innerComponents?.forEach((componentName) => {
 			const component = this.template.querySelector(componentName);
 			if (!component.reportValidity()) {
