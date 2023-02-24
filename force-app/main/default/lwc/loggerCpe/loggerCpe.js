@@ -11,7 +11,7 @@ import { ComboboxOption } from "c/comboboxUtils";
 
 const LEVEL_VAR_NAME = "logLevelName";
 const MSG_VAR_NAME = "logMessage";
-const MSG_TOOLTIP = `Can support flow variables using merge field syntax\nFor example: "{!myVar}"`;
+const MSG_TOOLTIP = `Supports merge field syntax. For example: "{!myVar}"`;
 // This is the absolute max for all long-text area fields in SFDC
 const MAX_LENGTH = 131072;
 
@@ -33,11 +33,12 @@ export default class CpeLogger extends CustomPropertyEditor {
 	maxLength = MAX_LENGTH;
 
 	@api validate() {
+		console.log("@jason: validate()");
 		let errors = [];
-		const innerComponents = ["apxsp-cpe-combobox", "lightning-textarea"];
+		const innerComponents = ["c-cpe-combobox", "lightning-textarea"];
 		innerComponents?.forEach((componentName) => {
 			const component = this.template.querySelector(componentName);
-			if (!component.reportValidity()) {
+			if (!component?.reportValidity()) {
 				errors.push(new Error(component?.label, `${component?.label} is invalid`));
 			}
 		});
