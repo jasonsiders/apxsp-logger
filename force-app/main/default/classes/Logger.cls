@@ -228,10 +228,13 @@ global without sharing abstract class Logger {
 		@InvocableVariable
 		global String logMessage;
 
+		@InvocableVariable
+		global AdvancedOptions options;
+
 		public void log() {
 			LoggingLevel level = (LoggingLevel) EnumUtils.valueOf(logLevelName, LoggingLevel.class);
 			if (level != null) {
-				Logger.log(level, logMessage);
+				Logger.log(level, this.options, this.logMessage);
 			}
 		}
 	}
