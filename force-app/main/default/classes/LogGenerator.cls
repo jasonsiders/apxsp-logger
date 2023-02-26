@@ -52,6 +52,6 @@ public class LogGenerator {
 			);
 			logs.add(log); 
 		}
-		Database.insert(logs, false);
+		DB.Dml.doInsert(logs, false);
 	}
 }
