@@ -10,8 +10,8 @@
 				}
 			],
 			"package": "apxsp-logger",
-			"versionName": "ver 0.3.0",
-			"versionNumber": "0.3.0.NEXT",
+			"versionName": "ver 0.4.0",
+			"versionNumber": "0.4.0.NEXT",
 			"versionDescription": ""
 		}
 	],
@@ -25,6 +25,7 @@
 		"apxsp-logger": "0HoDn000000k9xbKAA",
 		"apxsp-logger@0.1.0-1": "04tDn0000006m1QIAQ",
 		"apxsp-logger@0.2.0-1": "04tDn0000006m1pIAA",
-		"apxsp-logger@0.3.0-1": "04tDn0000006mITIAY"
+		"apxsp-logger@0.3.0-1": "04tDn0000006mITIAY",
+		"apxsp-logger@0.4.0-2": "04tDn0000006mIsIAI"
 	}
 }
