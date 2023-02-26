@@ -25,24 +25,12 @@ global without sharing abstract class Logger {
 		Logger.PendingLogs.clear();
 	}
 
-	global static void log(LoggingLevel level, Type apexClass, Object messageObj) {
-		// Note: Since Exception.getStackTraceString() returns null in managed packages,
-		// callers can use the optional `apexClass` param for rudimentary stack tracing
+	global static void log(LoggingLevel level, Type apexClass, Object msg) {
 		if (Logger.isEnabled(level)) {
-			System.debug(level, messageObj);
-			Log_Event__e event = new Log_Event__e(
-				Apex_Class__c = String.valueOf(apexClass),
-				Context__c = QUIDDITY?.name(),
-				Level__c = level?.name(),
-				Logged_At__c = DateTime.now(),
-				Message__c = String.valueOf(messageObj)?.abbreviate(MAX_LENGTH),
-				Running_User__c = UserInfo.getUserId(),
-				Sequence__c = Logger.Sequence++,
-				Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
-				Transaction_Id__c = TRANSACTION_ID
-			);
+			Log_Event__e event = Logger.generateEvent(level, apexClass, msg); 
 			Logger.populateLimitsData(event); 
 			Logger.pendingLogs.add(event); 
+			Logger.printToLog(level, msg); 
 		}
 	}
 
@@ -131,9 +119,7 @@ global without sharing abstract class Logger {
 		} catch (Exception error) {
 			RestContext.response.statusCode = 500;
 			RestContext.response.responseBody = Blob.valueOf(
-				JSON.serialize(new Map<String, String>{
-					 'message' => String.valueOf(error) 
-				})
+				JSON.serialize(new Map<String, String>{'message' => String.valueOf(error)})
 			);
 		}
 	}
@@ -176,6 +162,20 @@ global without sharing abstract class Logger {
 		return new LogException().sourceStackTrace();
 	}
 
+	static Log_Event__e generateEvent(System.LoggingLevel level, Type apexClass, Object msg) {
+		return new Log_Event__e(
+			Apex_Class__c = String.valueOf(apexClass),
+			Context__c = QUIDDITY?.name(),
+			Level__c = level?.name(),
+			Logged_At__c = DateTime.now(),
+			Message__c = String.valueOf(msg)?.abbreviate(MAX_LENGTH),
+			Running_User__c = UserInfo.getUserId(),
+			Sequence__c = Logger.Sequence++,
+			Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
+			Transaction_Id__c = TRANSACTION_ID
+		);
+	}
+
 	static void populateLimitsData(Log_Event__e event) {
 		if (Logger.Settings?.Include_Limits_Data__c == true) {
 			event.Aggregate_Queries_Limit__c = Limits.getLimitAggregateQueries();
@@ -209,6 +209,13 @@ global without sharing abstract class Logger {
 			event.SOQL_Queries_Limit__c = Limits.getLimitQueries();
 			event.SOQL_Query_Row_Limit__c = Limits.getLimitQueryRows();
 			event.SOSL_Query_Limit__c = Limits.getLimitSoslQueries();
+		}
+	}
+
+	static void printToLog(System.LoggingLevel level, Object msg) {
+		// Always print to log in a test context, to simplify development + debugging
+		if (Logger.Settings?.Print_To_Log__c == true || Test.isRunningTest()) {
+			System.debug(level, msg); 
 		}
 	}
 
