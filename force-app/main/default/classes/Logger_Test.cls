@@ -1,8 +1,9 @@
 @IsTest
 private class Logger_Test {
 	@IsTest
-	static void shouldSetCorrectValues() {
-		Logger.Settings = getActiveSettings(LoggingLevel.DEBUG);
+	static void shouldSetCorrectValuesWithLimits() {
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.DEBUG);
+		Logger.Settings.Include_Limits_Data__c = true; 
 
 		Logger.debug(Logger_Test.class, 'This is a test!');
 
@@ -19,6 +20,7 @@ private class Logger_Test {
 		System.assertEquals(Limits.getLimitFutureCalls(), logEvent?.Future_Calls_Limit__c, 'Wrong Future_Calls_Limit__c');
 		System.assertEquals(Limits.getLimitHeapSize(), logEvent?.Heap_Size_Limit__c, 'Wrong Heap_Size_Limit__c');
 		System.assertEquals(Limits.getLimitPublishImmediateDML(), logEvent?.Immediate_Platform_Event_Publish_Limit__c, 'Wrong Immediate_Platform_Event_Publish_Limit__c');
+		System.assertEquals(true, logEvent?.Include_Limits_Data__c, 'Wrong Include_Limits_Data__c');
 		System.assertEquals(LoggingLevel.DEBUG.name(), logEvent?.Level__c, 'Wrong Level');
 		System.assertNotEquals(null, logEvent?.Logged_At__c, 'Wrong Logged At');
 		System.assertEquals(Limits.getAggregateQueries(), logEvent?.Num_Aggregate_Queries__c, 'Wrong Num_Aggregate_Queries__c');
@@ -50,8 +52,58 @@ private class Logger_Test {
 	}
 
 	@IsTest
+	static void shouldSetCorrectValuesWithoutLimits() {
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.DEBUG);
+		Logger.Settings.Include_Limits_Data__c = false;
+
+		Logger.debug(Logger_Test.class, 'This is a test!');
+
+		System.assertEquals(1, Logger.PendingLogs?.size(), 'Wrong # of Pending Logs');
+		Log_Event__e logEvent = Logger.PendingLogs[0];
+		System.assertEquals(null, logEvent?.Aggregate_Queries_Limit__c, 'Wrong Aggregate_Queries_Limit__c');
+		System.assertEquals(String.valueOf(Logger_Test.class), logEvent?.Apex_Class__c, 'Wrong Apex Class');
+		System.assertEquals(null, logEvent?.Callouts_Limit__c, 'Wrong Callouts_Limit__c');
+		System.assertEquals(System.Request.getCurrent().getQuiddity().name(), logEvent?.Context__c, 'Wrong Context');
+		System.assertEquals(null, logEvent?.CPU_Time__c, 'Wrong CPU_Time__c');
+		System.assertEquals(null, logEvent?.CPU_Time_Limit__c, 'Wrong CPU_Time_Limit__c');
+		System.assertEquals(null, logEvent?.DML_Rows_Limit__c, 'Wrong DML_Rows_Limit__c');
+		System.assertEquals(null, logEvent?.DML_Statements_Limit__c, 'Wrong DML_Statements_Limit__c');
+		System.assertEquals(null, logEvent?.Email_Invocations_Limit__c, 'Wrong Email_Invocations_Limit__c');
+		System.assertEquals(null, logEvent?.Future_Calls_Limit__c, 'Wrong Future_Calls_Limit__c');
+		System.assertEquals(null, logEvent?.Heap_Size__c, 'Wrong Heap_Size__c');
+		System.assertEquals(null, logEvent?.Heap_Size_Limit__c, 'Wrong Heap_Size_Limit__c');
+		System.assertEquals(null, logEvent?.Immediate_Platform_Event_Publish_Limit__c, 'Wrong Immediate_Platform_Event_Publish_Limit__c');
+		System.assertEquals(false, logEvent?.Include_Limits_Data__c, 'Wrong Include_Limits_Data__c');
+		System.assertEquals(LoggingLevel.DEBUG.name(), logEvent?.Level__c, 'Wrong Level');
+		System.assertNotEquals(null, logEvent?.Logged_At__c, 'Wrong Logged At');
+		System.assertEquals(null, logEvent?.Num_Aggregate_Queries__c, 'Wrong Num_Aggregate_Queries__c');
+		System.assertEquals(null, logEvent?.Num_Callouts__c, 'Wrong Num_Callouts__c');
+		System.assertEquals(null, logEvent?.Num_DML_Rows__c, 'Wrong Num_DML_Rows__c');
+		System.assertEquals(null, logEvent?.Num_DML_Statements__c, 'Wrong Num_DML_Statements__c');
+		System.assertEquals(null, logEvent?.Num_Email_Invocations__c, 'Wrong Num_Email_Invocations__c');
+		System.assertEquals(null, logEvent?.Num_Future_Calls__c, 'Wrong Num_Future_Calls__c');
+		System.assertEquals(null, logEvent?.Num_Immediate_Platform_Event_Publish__c, 'Wrong Num_Immediate_Platform_Event_Publish__c');
+		System.assertEquals(null, logEvent?.Num_Push_Notifications__c, 'Wrong Num_Push_Notifications__c');
+		System.assertEquals(null, logEvent?.Num_QueryLocator_Rows__c, 'Wrong Num_QueryLocator_Rows__c');
+		System.assertEquals(null, logEvent?.Num_Queueable_Jobs__c, 'Wrong Num_Queueable_Jobs__c');
+		System.assertEquals(UserInfo.getUserId(), logEvent?.Running_User__c, 'Wrong Running_User__c');
+		System.assertEquals(null, logEvent?.Num_SOQL_Queries__c, 'Wrong Num_SOQL_Queries__c');
+		System.assertEquals(null, logEvent?.Num_SOQL_Query_Rows__c, 'Wrong Num_SOQL_Query_Rows__c');
+		System.assertEquals(null, logEvent?.Num_SOSL_Queries__c, 'Wrong Num_SOSL_Queries__c');
+		System.assertEquals(null, logEvent?.Push_Notifications_Limit__c, 'Wrong Push_Notifications_Limit__c');
+		System.assertEquals(null, logEvent?.QueryLocator_Row_Limit__c, 'Wrong QueryLocator_Row_Limit__c');
+		System.assertEquals(null, logEvent?.Queueable_Job_Limit__c, 'Wrong Queueable_Job_Limit__c');
+		System.assertequals(1, logEvent?.Sequence__c, 'Wrong Sequence__c');
+		System.assertEquals(null, logEvent?.SOQL_Queries_Limit__c, 'Wrong SOQL_Queries_Limit__c');
+		System.assertEquals(null, logEvent?.SOQL_Query_Row_Limit__c, 'Wrong SOQL_Query_Row_Limit__c');
+		System.assertEquals(null, logEvent?.SOSL_Query_Limit__c, 'Wrong SOSL_Query_Limit__c');
+		System.assertNotEquals(null, logEvent?.Stack_Trace__c, 'Wrong Stack_Trace__c');
+		System.assertEquals(System.Request.getCurrent().getRequestId(), logEvent?.Transaction_Id__c, 'Wrong Transaction_Id__c');
+	}
+
+	@IsTest
 	static void shouldLogIfThresholdIsMet() {
-		Logger.Settings = getActiveSettings(LoggingLevel.DEBUG);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.DEBUG);
 
 		// All Logging Levels above the current threshold (or NONE) should not log
 		for (
@@ -92,7 +144,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldLogFromApi() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		Logger.LogInput input = new Logger.LogInput();
 		input.logLevelName = LoggingLevel.FINEST.name();
 		input.logMessage = 'Hello world!';
@@ -126,7 +178,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldLogFromLightning() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		Logger.LogInput input = new Logger.LogInput();
 		input.logLevelName = LoggingLevel.FINEST.name();
 		input.logMessage = 'Hello world!';
@@ -142,7 +194,7 @@ private class Logger_Test {
 
 	@IsTest 
 	static void shouldDefaultToFinest() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST); 
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST); 
 
 		Test.startTest();
 		Logger.log('Hello world!');
@@ -155,7 +207,7 @@ private class Logger_Test {
 	@IsTest
 	static void shouldLogFromLevelSpecificMethod() {
 		// Callers can use the level-specific overrides below for brevity
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		LoggingLevel currentLevel;
 		Integer size = 0;
 
@@ -204,7 +256,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldIncludeApexClass() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		Type apexClass = Logger_Test.class;
 
 		Test.startTest();
@@ -259,7 +311,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldLogAllIfThresholdIsFinest() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 
 		Test.startTest();
 		for (LoggingLevel level : LoggingLevel.values()) {
@@ -277,7 +329,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldNotLogIfThresholdIsNone() {
-		Logger.Settings = getActiveSettings(LoggingLevel.NONE);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.NONE);
 
 		Test.startTest();
 		for (LoggingLevel level : LoggingLevel.values()) {
@@ -294,7 +346,7 @@ private class Logger_Test {
 
 	@IsTest
 	static void shouldNotLogIfNullLoggingLevel() {
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 
 		Test.startTest();
 		Logger.log(null, 'Hello world');
@@ -307,7 +359,7 @@ private class Logger_Test {
 	static void shouldIncrementSequence() {
 		// The Sequence__c field helps us to piece together a timeline;
 		// It shows the order that log statements were generated in its Transaction_Id__c
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		for (Integer i = 0; i < 100; i++) {
 			Integer logNumber = (i + 1);
 			Logger.info('Test Message #' + logNumber);
@@ -321,7 +373,7 @@ private class Logger_Test {
 		// The Log Event's stack trace field should start from
 		// where the Logger class is called from - not the Logger class itself
 		String prefixFormat = 'Class.{0}.';
-		Logger.Settings = getActiveSettings(LoggingLevel.FINEST);
+		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		DmlMock dmlMock = (DmlMock) DB.setDmlEngine(new DmlMock());
 		// Try logging from directly in the test class
 		Logger.finest('Test Message');
