@@ -1,19 +1,12 @@
 @RestResource(urlMapping='/log')
 global without sharing abstract class Logger {
 	static final Integer MAX_LENGTH = Log__c.Message__c.getDescribe()?.getLength();
+	static final System.Quiddity QUIDDITY = System.Request.getCurrent().getQuiddity(); 
+	static final String TRANSACTION_ID = System.Request.getCurrent().getRequestId(); 
+	@TestVisible static List<Log_Event__e> PendingLogs = new List<Log_Event__e>();
 	static Integer Sequence = 1;
-
-	@TestVisible
-	static List<Log_Event__e> PendingLogs = new List<Log_Event__e>();
-
-	@TestVisible
-	static List<Log_Event__e> PublishedLogs = new List<Log_Event__e>();
-
-	@TestVisible
-	static Log_Setting__c Settings = Logger.getLogSettings();
-
-	@TestVisible
-	static LoggingLevel Threshold {
+	@TestVisible static Log_Setting__c Settings = Logger.getLogSettings();
+	@TestVisible static LoggingLevel Threshold {
 		get {
 			Boolean matchesSettings = Logger.Threshold?.name()?.equalsIgnoreCase(Logger.Settings?.Level__c);
 			if (matchesSettings != true) {
@@ -28,29 +21,16 @@ global without sharing abstract class Logger {
 	// **** GLOBAL **** //
 	@AuraEnabled
 	global static void publish() {
-		Logger.PublishedLogs.addAll(Logger.PendingLogs);
 		DB.Dml.doPublish(Logger.PendingLogs);
 		Logger.PendingLogs.clear();
 	}
 
-	global static void log(LoggingLevel level, Type apexClass, Object messageObj) {
-		// Note: Since Exception.getStackTraceString() returns null in managed packages,
-		// callers can use the optional `apexClass` param for rudimentary stack tracing
+	global static void log(LoggingLevel level, Type apexClass, Object msg) {
 		if (Logger.isEnabled(level)) {
-			System.debug(level, messageObj);
-			Logger.PendingLogs.add(
-				new Log_Event__e(
-					Apex_Class__c = String.valueOf(apexClass),
-					Context__c = System.Request.getCurrent().getQuiddity()?.name(),
-					Level__c = level?.name(),
-					Logged_At__c = DateTime.now(),
-					Message__c = String.valueOf(messageObj)?.abbreviate(MAX_LENGTH),
-					Running_User__c = UserInfo.getUserId(),
-					Sequence__c = Logger.Sequence++,
-					Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
-					Transaction_Id__c = System.Request.getCurrent()?.getRequestId()
-				)
-			);
+			Log_Event__e event = Logger.generateEvent(level, apexClass, msg); 
+			Logger.populateLimitsData(event); 
+			Logger.pendingLogs.add(event); 
+			Logger.printToLog(level, msg); 
 		}
 	}
 
@@ -139,9 +119,7 @@ global without sharing abstract class Logger {
 		} catch (Exception error) {
 			RestContext.response.statusCode = 500;
 			RestContext.response.responseBody = Blob.valueOf(
-				JSON.serialize(new Map<String, String>{
-					 'message' => String.valueOf(error) 
-				})
+				JSON.serialize(new Map<String, String>{'message' => String.valueOf(error)})
 			);
 		}
 	}
@@ -182,6 +160,63 @@ global without sharing abstract class Logger {
 
 	static String getStackTrace() {
 		return new LogException().sourceStackTrace();
+	}
+
+	static Log_Event__e generateEvent(System.LoggingLevel level, Type apexClass, Object msg) {
+		return new Log_Event__e(
+			Apex_Class__c = String.valueOf(apexClass),
+			Context__c = QUIDDITY?.name(),
+			Level__c = level?.name(),
+			Logged_At__c = DateTime.now(),
+			Message__c = String.valueOf(msg)?.abbreviate(MAX_LENGTH),
+			Running_User__c = UserInfo.getUserId(),
+			Sequence__c = Logger.Sequence++,
+			Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
+			Transaction_Id__c = TRANSACTION_ID
+		);
+	}
+
+	static void populateLimitsData(Log_Event__e event) {
+		if (Logger.Settings?.Include_Limits_Data__c == true) {
+			event.Aggregate_Queries_Limit__c = Limits.getLimitAggregateQueries();
+			event.Callouts_Limit__c = Limits.getLimitCallouts();
+			event.CPU_Time__c = Limits.getCpuTime();
+			event.CPU_Time_Limit__c = Limits.getLimitCpuTime();
+			event.DML_Rows_Limit__c = Limits.getLimitDMLRows();
+			event.DML_Statements_Limit__c = Limits.getLimitDMLStatements();
+			event.Email_Invocations_Limit__c = Limits.getLimitEmailInvocations();
+			event.Future_Calls_Limit__c = Limits.getLimitFutureCalls();
+			event.Heap_Size__c = Limits.getHeapSize();
+			event.Heap_Size_Limit__c = Limits.getLimitHeapSize();
+			event.Immediate_Platform_Event_Publish_Limit__c = Limits.getLimitPublishImmediateDML();
+			event.Include_Limits_Data__c = true; 
+			event.Num_Aggregate_Queries__c = Limits.getAggregateQueries();
+			event.Num_Callouts__c = Limits.getCallouts();
+			event.Num_DML_Rows__c = Limits.getDMLRows();
+			event.Num_DML_Statements__c = Limits.getDMLStatements();
+			event.Num_Email_Invocations__c = Limits.getEmailInvocations();
+			event.Num_Future_Calls__c = Limits.getFutureCalls();
+			event.Num_Immediate_Platform_Event_Publish__c = Limits.getPublishImmediateDML();
+			event.Num_Push_Notifications__c = Limits.getMobilePushApexCalls();
+			event.Num_QueryLocator_Rows__c = Limits.getQueryLocatorRows();
+			event.Num_Queueable_Jobs__c = Limits.getQueueableJobs();
+			event.Num_SOQL_Queries__c = Limits.getQueries();
+			event.Num_SOQL_Query_Rows__c = Limits.getQueryRows();
+			event.Num_SOSL_Queries__c = Limits.getSoslQueries();
+			event.Push_Notifications_Limit__c = Limits.getLimitMobilePushApexCalls();
+			event.QueryLocator_Row_Limit__c = Limits.getLimitQueryLocatorRows();
+			event.Queueable_Job_Limit__c = Limits.getLimitQueueableJobs();
+			event.SOQL_Queries_Limit__c = Limits.getLimitQueries();
+			event.SOQL_Query_Row_Limit__c = Limits.getLimitQueryRows();
+			event.SOSL_Query_Limit__c = Limits.getLimitSoslQueries();
+		}
+	}
+
+	static void printToLog(System.LoggingLevel level, Object msg) {
+		// Always print to log in a test context, to simplify development + debugging
+		if (Logger.Settings?.Print_To_Log__c == true || Test.isRunningTest()) {
+			System.debug(level, msg); 
+		}
 	}
 
 	// **** INNER **** //
