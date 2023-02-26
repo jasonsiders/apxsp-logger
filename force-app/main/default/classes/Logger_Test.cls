@@ -158,8 +158,9 @@ private class Logger_Test {
 		Logger.log();
 		Test.stopTest();
 
-		System.assertEquals(1, Logger.PublishedLogs?.size(), 'Wrong # of published logs');
-		System.assertEquals(input.logMessage, Logger.PublishedLogs[0].Message__c, 'Wrong message');
+		List<Log_Event__e> published = Dml.Published.getRecords(Log_Event__e.SObjectType); 
+		System.assertEquals(1, published?.size(), 'Wrong # of published logs');
+		System.assertEquals(input.logMessage, published[0].Message__c, 'Wrong message');
 	}
 
 	@IsTest 
@@ -188,8 +189,9 @@ private class Logger_Test {
 		Logger.publish(); 
 		Test.stopTest();
 
-		System.assertEquals(1, Logger.PublishedLogs?.size(), 'Wrong # of pending logs');
-		System.assertEquals(input.logMessage, Logger.PublishedLogs[0].Message__c, 'Wrong message');
+		List<Log_Event__e> published = Dml.Published.getRecords(Log_Event__e.SObjectType);
+		System.assertEquals(1, published?.size(), 'Wrong # of pending logs');
+		System.assertEquals(input.logMessage, published[0].Message__c, 'Wrong message');
 	}
 
 	@IsTest 

@@ -1,19 +1,12 @@
 @RestResource(urlMapping='/log')
 global without sharing abstract class Logger {
 	static final Integer MAX_LENGTH = Log__c.Message__c.getDescribe()?.getLength();
+	static final System.Quiddity QUIDDITY = System.Request.getCurrent().getQuiddity(); 
+	static final String TRANSACTION_ID = System.Request.getCurrent().getRequestId(); 
+	@TestVisible static List<Log_Event__e> PendingLogs = new List<Log_Event__e>();
 	static Integer Sequence = 1;
-
-	@TestVisible
-	static List<Log_Event__e> PendingLogs = new List<Log_Event__e>();
-
-	@TestVisible
-	static List<Log_Event__e> PublishedLogs = new List<Log_Event__e>();
-
-	@TestVisible
-	static Log_Setting__c Settings = Logger.getLogSettings();
-
-	@TestVisible
-	static LoggingLevel Threshold {
+	@TestVisible static Log_Setting__c Settings = Logger.getLogSettings();
+	@TestVisible static LoggingLevel Threshold {
 		get {
 			Boolean matchesSettings = Logger.Threshold?.name()?.equalsIgnoreCase(Logger.Settings?.Level__c);
 			if (matchesSettings != true) {
@@ -28,7 +21,6 @@ global without sharing abstract class Logger {
 	// **** GLOBAL **** //
 	@AuraEnabled
 	global static void publish() {
-		Logger.PublishedLogs.addAll(Logger.PendingLogs);
 		DB.Dml.doPublish(Logger.PendingLogs);
 		Logger.PendingLogs.clear();
 	}
@@ -40,14 +32,14 @@ global without sharing abstract class Logger {
 			System.debug(level, messageObj);
 			Log_Event__e event = new Log_Event__e(
 				Apex_Class__c = String.valueOf(apexClass),
-				Context__c = System.Request.getCurrent().getQuiddity()?.name(),
+				Context__c = QUIDDITY?.name(),
 				Level__c = level?.name(),
 				Logged_At__c = DateTime.now(),
 				Message__c = String.valueOf(messageObj)?.abbreviate(MAX_LENGTH),
 				Running_User__c = UserInfo.getUserId(),
 				Sequence__c = Logger.Sequence++,
 				Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
-				Transaction_Id__c = System.Request.getCurrent()?.getRequestId()
+				Transaction_Id__c = TRANSACTION_ID
 			);
 			Logger.populateLimitsData(event); 
 			Logger.pendingLogs.add(event); 
