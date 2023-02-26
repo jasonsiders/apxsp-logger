@@ -30,20 +30,17 @@ private class LogEventHandler_Test {
 		System.Request req = System.Request.getCurrent();
 		String stack = new System.DmlException()?.getStackTraceString();
 		for (Integer i = 0; i < 200; i++) {
-			logEvents
-				?.add(
-					new Log_Event__e(
-						Apex_Class__c = String.valueOf(LogEventHandler_Test.class),
-						Context__c = req.getQuiddity()?.name(),
-						Level__c = 'FINEST',
-						Logged_At__c = DateTime.now().addSeconds(-5),
-						Message__c = 'Test Log #' + (i + 1),
-						Running_User__c = userId,
-						Sequence__c = (i + 1),
-						Stack_Trace__c = stack,
-						Transaction_Id__c = req.getRequestId()
-					)
-				);
+			Log_Event__e event = new Log_Event__e(
+				Context__c = req.getQuiddity()?.name(),
+				Level__c = 'FINEST',
+				Logged_At__c = DateTime.now().addSeconds(-5),
+				Message__c = 'Test Log #' + (i + 1),
+				Running_User__c = userId,
+				Sequence__c = (i + 1),
+				Stack_Trace__c = stack,
+				Transaction_Id__c = req.getRequestId()
+			);
+			logEvents.add(event); 
 		}
 		return logEvents;
 	}
