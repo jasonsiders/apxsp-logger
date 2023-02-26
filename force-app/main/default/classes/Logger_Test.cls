@@ -8,18 +8,45 @@ private class Logger_Test {
 
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Wrong # of Pending Logs');
 		Log_Event__e logEvent = Logger.PendingLogs[0];
+		System.assertEquals(Limits.getLimitAggregateQueries(), logEvent?.Aggregate_Queries_Limit__c, 'Wrong Aggregate_Queries_Limit__c');
 		System.assertEquals(String.valueOf(Logger_Test.class), logEvent?.Apex_Class__c, 'Wrong Apex Class');
+		System.assertEquals(Limits.getLimitCallouts(), logEvent?.Callouts_Limit__c, 'Wrong Callouts_Limit__c');
 		System.assertEquals(System.Request.getCurrent().getQuiddity().name(), logEvent?.Context__c, 'Wrong Context');
+		System.assertEquals(Limits.getLimitCpuTime(), logEvent?.CPU_Time_Limit__c, 'Wrong CPU_Time_Limit__c');
+		System.assertEquals(Limits.getLimitDMLRows(), logEvent?.DML_Rows_Limit__c, 'Wrong DML_Rows_Limit__c');
+		System.assertEquals(Limits.getLimitDMLStatements(), logEvent?.DML_Statements_Limit__c, 'Wrong DML_Statements_Limit__c');
+		System.assertEquals(Limits.getLimitEmailInvocations(), logEvent?.Email_Invocations_Limit__c, 'Wrong Email_Invocations_Limit__c');
+		System.assertEquals(Limits.getLimitFutureCalls(), logEvent?.Future_Calls_Limit__c, 'Wrong Future_Calls_Limit__c');
+		System.assertEquals(Limits.getLimitHeapSize(), logEvent?.Heap_Size_Limit__c, 'Wrong Heap_Size_Limit__c');
+		System.assertEquals(Limits.getLimitPublishImmediateDML(), logEvent?.Immediate_Platform_Event_Publish_Limit__c, 'Wrong Immediate_Platform_Event_Publish_Limit__c');
 		System.assertEquals(LoggingLevel.DEBUG.name(), logEvent?.Level__c, 'Wrong Level');
 		System.assertNotEquals(null, logEvent?.Logged_At__c, 'Wrong Logged At');
+		System.assertEquals(Limits.getAggregateQueries(), logEvent?.Num_Aggregate_Queries__c, 'Wrong Num_Aggregate_Queries__c');
+		System.assertEquals(Limits.getCallouts(), logEvent?.Num_Callouts__c, 'Wrong Num_Callouts__c');
+		System.assertEquals(Limits.getDMLRows(), logEvent?.Num_DML_Rows__c, 'Wrong Num_DML_Rows__c');
+		System.assertEquals(Limits.getDMLStatements(), logEvent?.Num_DML_Statements__c, 'Wrong Num_DML_Statements__c');
+		System.assertEquals(Limits.getEmailInvocations(), logEvent?.Num_Email_Invocations__c, 'Wrong Num_Email_Invocations__c');
+		System.assertEquals(Limits.getFutureCalls(), logEvent?.Num_Future_Calls__c, 'Wrong Num_Future_Calls__c');
+		System.assertEquals(Limits.getPublishImmediateDML(), logEvent?.Num_Immediate_Platform_Event_Publish__c, 'Wrong Num_Immediate_Platform_Event_Publish__c');
+		System.assertEquals(Limits.getMobilePushApexCalls(), logEvent?.Num_Push_Notifications__c, 'Wrong Num_Push_Notifications__c');
+		System.assertEquals(Limits.getQueryLocatorRows(), logEvent?.Num_QueryLocator_Rows__c, 'Wrong Num_QueryLocator_Rows__c');
+		System.assertEquals(Limits.getQueueableJobs(), logEvent?.Num_Queueable_Jobs__c, 'Wrong Num_Queueable_Jobs__c');
 		System.assertEquals(UserInfo.getUserId(), logEvent?.Running_User__c, 'Wrong Running_User__c');
+		System.assertEquals(Limits.getQueries(), logEvent?.Num_SOQL_Queries__c, 'Wrong Num_SOQL_Queries__c');
+		System.assertEquals(Limits.getQueryRows(), logEvent?.Num_SOQL_Query_Rows__c, 'Wrong Num_SOQL_Query_Rows__c');
+		System.assertEquals(Limits.getSoslQueries(), logEvent?.Num_SOSL_Queries__c, 'Wrong Num_SOSL_Queries__c');
+		System.assertEquals(Limits.getLimitMobilePushApexCalls(), logEvent?.Push_Notifications_Limit__c, 'Wrong Push_Notifications_Limit__c');
+		System.assertEquals(Limits.getLimitQueryLocatorRows(), logEvent?.QueryLocator_Row_Limit__c, 'Wrong QueryLocator_Row_Limit__c');
+		System.assertEquals(Limits.getLimitQueueableJobs(), logEvent?.Queueable_Job_Limit__c, 'Wrong Queueable_Job_Limit__c');
 		System.assertequals(1, logEvent?.Sequence__c, 'Wrong Sequence__c');
+		System.assertEquals(Limits.getLimitQueries(), logEvent?.SOQL_Queries_Limit__c, 'Wrong SOQL_Queries_Limit__c');
+		System.assertEquals(Limits.getLimitQueryRows(), logEvent?.SOQL_Query_Row_Limit__c, 'Wrong SOQL_Query_Row_Limit__c');
+		System.assertEquals(Limits.getLimitSoslQueries(), logEvent?.SOSL_Query_Limit__c, 'Wrong SOSL_Query_Limit__c');
 		System.assertNotEquals(null, logEvent?.Stack_Trace__c, 'Wrong Stack_Trace__c');
-		System.assertEquals(
-			System.Request.getCurrent().getRequestId(),
-			logEvent?.Transaction_Id__c,
-			'Wrong Transaction_Id__c'
-		);
+		System.assertEquals(System.Request.getCurrent().getRequestId(), logEvent?.Transaction_Id__c, 'Wrong Transaction_Id__c');
+		// Note: The progress towards these limits have likely changed since the log was generated. Enough to assert they are set. 
+		System.assertNotEquals(null, logEvent?.CPU_Time__c, 'Missing CPU_Time__c');
+		System.assertNotEquals(null, logEvent?.Heap_Size__c, 'Missing Heap_Size__c');
 	}
 
 	@IsTest
