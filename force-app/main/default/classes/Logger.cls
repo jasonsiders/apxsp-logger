@@ -25,9 +25,9 @@ global without sharing abstract class Logger {
 		Logger.PendingLogs.clear();
 	}
 
-	global static void log(LoggingLevel level, Type apexClass, Object msg) {
+	global static void log(LoggingLevel level, AdvancedOptions options, Object msg) {
 		if (Logger.isEnabled(level)) {
-			Log_Event__e event = Logger.generateEvent(level, apexClass, msg); 
+			Log_Event__e event = Logger.generateEvent(level, options, msg); 
 			Logger.populateLimitsData(event); 
 			Logger.pendingLogs.add(event); 
 			Logger.printToLog(level, msg); 
@@ -51,20 +51,20 @@ global without sharing abstract class Logger {
 		}
 	}
 
-	global static void error(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.ERROR, apexClass, message);
+	global static void error(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.ERROR, options, message);
 	}
 
 	global static void error(Object message) {
 		Logger.error(null, message);
 	}
 
-	global static void warn(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.WARN, apexClass, message);
+	global static void warn(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.WARN, options, message);
 	}
 
-	global static void info(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.INFO, apexClass, message);
+	global static void info(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.INFO, options, message);
 	}
 
 	global static void info(Object message) {
@@ -75,32 +75,32 @@ global without sharing abstract class Logger {
 		Logger.warn(null, message);
 	}
 
-	global static void debug(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.DEBUG, apexClass, message);
+	global static void debug(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.DEBUG, options, message);
 	}
 
 	global static void debug(Object message) {
 		Logger.debug(null, message);
 	}
 
-	global static void fine(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.FINE, apexClass, message);
+	global static void fine(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.FINE, options, message);
 	}
 
 	global static void fine(Object message) {
 		Logger.fine(null, message);
 	}
 
-	global static void finer(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.FINER, apexClass, message);
+	global static void finer(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.FINER, options, message);
 	}
 
 	global static void finer(Object message) {
 		Logger.finer(null, message);
 	}
 
-	global static void finest(Type apexClass, Object message) {
-		Logger.log(LoggingLevel.FINEST, apexClass, message);
+	global static void finest(AdvancedOptions options, Object message) {
+		Logger.log(LoggingLevel.FINEST, options, message);
 	}
 
 	global static void finest(Object message) {
@@ -162,9 +162,8 @@ global without sharing abstract class Logger {
 		return new LogException().sourceStackTrace();
 	}
 
-	static Log_Event__e generateEvent(System.LoggingLevel level, Type apexClass, Object msg) {
-		return new Log_Event__e(
-			Apex_Class__c = String.valueOf(apexClass),
+	static Log_Event__e generateEvent(System.LoggingLevel level, AdvancedOptions options, Object msg) {
+		Log_Event__e event = new Log_Event__e(
 			Context__c = QUIDDITY?.name(),
 			Level__c = level?.name(),
 			Logged_At__c = DateTime.now(),
@@ -174,6 +173,8 @@ global without sharing abstract class Logger {
 			Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
 			Transaction_Id__c = TRANSACTION_ID
 		);
+		options?.visit(event);
+		return event; 
 	}
 
 	static void populateLimitsData(Log_Event__e event) {
@@ -235,7 +236,7 @@ global without sharing abstract class Logger {
 		}
 	}
 
-	global class Options {
+	global class AdvancedOptions {
 		// Contains optional fields which can be set on a log
 		@InvocableVariable(label='Related Record ID')
 		global Id recordId;
@@ -243,17 +244,17 @@ global without sharing abstract class Logger {
 		@InvocableVariable(label='Source')
 		global String source;
 
-		global Options setRecordId(Id recordId) {
+		global AdvancedOptions setRecordId(Id recordId) {
 			this.recordId = recordId;
 			return this;
 		}
 
-		global Options setSource(Type sourceType) {
+		global AdvancedOptions setSource(Type sourceType) {
 			this.source = String.valueOf(sourceType);
 			return this;
 		}
 
-		public void visit(Log__b log) {
+		public void visit(Log_Event__e log) {
 			// Updates all fields on the log related to the options record
 			log.Related_Record_ID__c = this.recordId;
 			log.Source__c = this.source;
