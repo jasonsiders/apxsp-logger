@@ -49,39 +49,7 @@ global without sharing abstract class Logger {
 				Stack_Trace__c = Logger.getStackTrace()?.abbreviate(MAX_LENGTH),
 				Transaction_Id__c = System.Request.getCurrent()?.getRequestId()
 			);
-			if (Logger.Settings?.Include_Limits_Data__c == true) {
-				event.Aggregate_Queries_Limit__c = Limits.getLimitAggregateQueries();
-				event.Callouts_Limit__c = Limits.getLimitCallouts();
-				event.CPU_Time__c = Limits.getCpuTime();
-				event.CPU_Time_Limit__c = Limits.getLimitCpuTime();
-				event.DML_Rows_Limit__c = Limits.getLimitDMLRows();
-				event.DML_Statements_Limit__c = Limits.getLimitDMLStatements();
-				event.Email_Invocations_Limit__c = Limits.getLimitEmailInvocations();
-				event.Future_Calls_Limit__c = Limits.getLimitFutureCalls();
-				event.Heap_Size__c = Limits.getHeapSize();
-				event.Heap_Size_Limit__c = Limits.getLimitHeapSize();
-				event.Immediate_Platform_Event_Publish_Limit__c = Limits.getLimitPublishImmediateDML();
-				event.Include_Limits_Data__c = true; 
-				event.Num_Aggregate_Queries__c = Limits.getAggregateQueries();
-				event.Num_Callouts__c = Limits.getCallouts();
-				event.Num_DML_Rows__c = Limits.getDMLRows();
-				event.Num_DML_Statements__c = Limits.getDMLStatements();
-				event.Num_Email_Invocations__c = Limits.getEmailInvocations();
-				event.Num_Future_Calls__c = Limits.getFutureCalls();
-				event.Num_Immediate_Platform_Event_Publish__c = Limits.getPublishImmediateDML();
-				event.Num_Push_Notifications__c = Limits.getMobilePushApexCalls();
-				event.Num_QueryLocator_Rows__c = Limits.getQueryLocatorRows();
-				event.Num_Queueable_Jobs__c = Limits.getQueueableJobs();
-				event.Num_SOQL_Queries__c = Limits.getQueries();
-				event.Num_SOQL_Query_Rows__c = Limits.getQueryRows();
-				event.Num_SOSL_Queries__c = Limits.getSoslQueries();
-				event.Push_Notifications_Limit__c = Limits.getLimitMobilePushApexCalls();
-				event.QueryLocator_Row_Limit__c = Limits.getLimitQueryLocatorRows();
-				event.Queueable_Job_Limit__c = Limits.getLimitQueueableJobs();
-				event.SOQL_Queries_Limit__c = Limits.getLimitQueries();
-				event.SOQL_Query_Row_Limit__c = Limits.getLimitQueryRows();
-				event.SOSL_Query_Limit__c = Limits.getLimitSoslQueries();
-			}
+			Logger.populateLimitsData(event); 
 			Logger.pendingLogs.add(event); 
 		}
 	}
@@ -214,6 +182,42 @@ global without sharing abstract class Logger {
 
 	static String getStackTrace() {
 		return new LogException().sourceStackTrace();
+	}
+
+	static void populateLimitsData(Log_Event__e event) {
+		if (Logger.Settings?.Include_Limits_Data__c == true) {
+			event.Aggregate_Queries_Limit__c = Limits.getLimitAggregateQueries();
+			event.Callouts_Limit__c = Limits.getLimitCallouts();
+			event.CPU_Time__c = Limits.getCpuTime();
+			event.CPU_Time_Limit__c = Limits.getLimitCpuTime();
+			event.DML_Rows_Limit__c = Limits.getLimitDMLRows();
+			event.DML_Statements_Limit__c = Limits.getLimitDMLStatements();
+			event.Email_Invocations_Limit__c = Limits.getLimitEmailInvocations();
+			event.Future_Calls_Limit__c = Limits.getLimitFutureCalls();
+			event.Heap_Size__c = Limits.getHeapSize();
+			event.Heap_Size_Limit__c = Limits.getLimitHeapSize();
+			event.Immediate_Platform_Event_Publish_Limit__c = Limits.getLimitPublishImmediateDML();
+			event.Include_Limits_Data__c = true; 
+			event.Num_Aggregate_Queries__c = Limits.getAggregateQueries();
+			event.Num_Callouts__c = Limits.getCallouts();
+			event.Num_DML_Rows__c = Limits.getDMLRows();
+			event.Num_DML_Statements__c = Limits.getDMLStatements();
+			event.Num_Email_Invocations__c = Limits.getEmailInvocations();
+			event.Num_Future_Calls__c = Limits.getFutureCalls();
+			event.Num_Immediate_Platform_Event_Publish__c = Limits.getPublishImmediateDML();
+			event.Num_Push_Notifications__c = Limits.getMobilePushApexCalls();
+			event.Num_QueryLocator_Rows__c = Limits.getQueryLocatorRows();
+			event.Num_Queueable_Jobs__c = Limits.getQueueableJobs();
+			event.Num_SOQL_Queries__c = Limits.getQueries();
+			event.Num_SOQL_Query_Rows__c = Limits.getQueryRows();
+			event.Num_SOSL_Queries__c = Limits.getSoslQueries();
+			event.Push_Notifications_Limit__c = Limits.getLimitMobilePushApexCalls();
+			event.QueryLocator_Row_Limit__c = Limits.getLimitQueryLocatorRows();
+			event.Queueable_Job_Limit__c = Limits.getLimitQueueableJobs();
+			event.SOQL_Queries_Limit__c = Limits.getLimitQueries();
+			event.SOQL_Query_Row_Limit__c = Limits.getLimitQueryRows();
+			event.SOSL_Query_Limit__c = Limits.getLimitSoslQueries();
+		}
 	}
 
 	// **** INNER **** //
