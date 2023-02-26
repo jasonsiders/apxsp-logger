@@ -235,6 +235,31 @@ global without sharing abstract class Logger {
 		}
 	}
 
+	global class Options {
+		// Contains optional fields which can be set on a log
+		@InvocableVariable(label='Related Record ID')
+		global Id recordId;
+
+		@InvocableVariable(label='Source')
+		global String source;
+
+		global Options setRecordId(Id recordId) {
+			this.recordId = recordId;
+			return this;
+		}
+
+		global Options setSource(Type sourceType) {
+			this.source = String.valueOf(sourceType);
+			return this;
+		}
+
+		public void visit(Log__b log) {
+			// Updates all fields on the log related to the options record
+			log.Related_Record_ID__c = this.recordId;
+			log.Source__c = this.source;
+		}
+	}
+
 	private class LogException extends Exception {
 		private String sourceStackTrace() {
 			List<String> stackTraceLines = new List<String>();
