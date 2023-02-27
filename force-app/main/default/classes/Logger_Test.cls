@@ -5,12 +5,11 @@ private class Logger_Test {
 		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.DEBUG);
 		Logger.Settings.Include_Limits_Data__c = true; 
 
-		Logger.debug(Logger_Test.class, 'This is a test!');
+		Logger.debug('This is a test!');
 
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Wrong # of Pending Logs');
 		Log_Event__e logEvent = Logger.PendingLogs[0];
 		System.assertEquals(Limits.getLimitAggregateQueries(), logEvent?.Aggregate_Queries_Limit__c, 'Wrong Aggregate_Queries_Limit__c');
-		System.assertEquals(String.valueOf(Logger_Test.class), logEvent?.Apex_Class__c, 'Wrong Apex Class');
 		System.assertEquals(Limits.getLimitCallouts(), logEvent?.Callouts_Limit__c, 'Wrong Callouts_Limit__c');
 		System.assertEquals(System.Request.getCurrent().getQuiddity().name(), logEvent?.Context__c, 'Wrong Context');
 		System.assertEquals(Limits.getLimitCpuTime(), logEvent?.CPU_Time_Limit__c, 'Wrong CPU_Time_Limit__c');
@@ -56,12 +55,11 @@ private class Logger_Test {
 		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.DEBUG);
 		Logger.Settings.Include_Limits_Data__c = false;
 
-		Logger.debug(Logger_Test.class, 'This is a test!');
+		Logger.debug('This is a test!');
 
 		System.assertEquals(1, Logger.PendingLogs?.size(), 'Wrong # of Pending Logs');
 		Log_Event__e logEvent = Logger.PendingLogs[0];
 		System.assertEquals(null, logEvent?.Aggregate_Queries_Limit__c, 'Wrong Aggregate_Queries_Limit__c');
-		System.assertEquals(String.valueOf(Logger_Test.class), logEvent?.Apex_Class__c, 'Wrong Apex Class');
 		System.assertEquals(null, logEvent?.Callouts_Limit__c, 'Wrong Callouts_Limit__c');
 		System.assertEquals(System.Request.getCurrent().getQuiddity().name(), logEvent?.Context__c, 'Wrong Context');
 		System.assertEquals(null, logEvent?.CPU_Time__c, 'Wrong CPU_Time__c');
@@ -257,23 +255,26 @@ private class Logger_Test {
 	}
 
 	@IsTest
-	static void shouldIncludeApexClass() {
+	static void shouldIncludeAdvancedOptions() {
 		Logger.Settings = Logger_Test.getActiveSettings(LoggingLevel.FINEST);
 		Type apexClass = Logger_Test.class;
+		Id relatedRecordId = UserInfo.getUserId();
+		Logger.AdvancedOptions options = new Logger.AdvancedOptions().setSource(apexClass).setRecordId(relatedRecordId);
 
 		Test.startTest();
-		Logger.error(apexClass, 'This is a test');
-		Logger.warn(apexClass, 'This is a test');
-		Logger.info(apexClass, 'This is a test');
-		Logger.debug(apexClass, 'This is a test');
-		Logger.fine(apexClass, 'This is a test');
-		Logger.finer(apexClass, 'This is a test');
-		Logger.finest(apexClass, 'This is a test');
+		Logger.error(options, 'This is a test');
+		Logger.warn(options, 'This is a test');
+		Logger.info(options, 'This is a test');
+		Logger.debug(options, 'This is a test');
+		Logger.fine(options, 'This is a test');
+		Logger.finer(options, 'This is a test');
+		Logger.finest(options, 'This is a test');
 		Test.stopTest();
 
 		System.assertEquals(false, Logger.PendingLogs?.isEmpty(), 'No logs were generated');
 		for (Log_Event__e log : Logger.PendingLogs) {
-			System.assertEquals(String.valueOf(apexClass), log.Apex_Class__c, 'Wrong Apex Class value');
+			System.assertEquals(String.valueOf(apexClass), log.Source__c, 'Wrong Source value');
+			System.assertEquals(relatedRecordId, log.Related_Record_ID__c, 'Wrong Related Record ID');
 		}
 	}
 
