@@ -6,7 +6,7 @@
 			"dependencies": [
 				{
 					"package": "apex-starter-pack",
-					"versionNumber": "0.6.0.LATEST"
+					"versionNumber": "0.7.0.LATEST"
 				}
 			],
 			"package": "apxsp-logger",
