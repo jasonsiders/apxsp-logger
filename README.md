@@ -43,5 +43,3 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 ## License
 
 See [LICENSE.md](LICENSE.md) for more details.
-
-## Documentation
