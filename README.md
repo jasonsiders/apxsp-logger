@@ -14,7 +14,7 @@ Using the included `apxsp.Logger` methods, developers can hook into the logging 
 
 `apxsp-logger` is available as an unlocked package. See [Releases](https://github.com/jasonsiders/apxsp-logger/releases) for the latest install link.
 
-Note: You must first install any dependencies listed in the [sfdx-project.json](https://github.com/jasonsiders/apex-starter-pack/blob/main/sfdx-project.json) file.
+Note: You must first install any dependencies listed in the [sfdx-project.json](https://github.com/jasonsiders/apxsp-logger/blob/main/sfdx-project.json) file.
 
 ### **For Development**
 
